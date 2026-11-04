@@ -297,7 +297,7 @@ function renderHouse(lp, live) {
     const batteryText = battery < 50
       ? translate(Number(state.bat) >= 99.5 ? "batteryFull" : "batteryPaused")
       : `${translate(Number(state.batp) < 0 ? "batteryCharging" : "batteryDischarging")} ${formatPower(battery)}`;
-    ui.barLeft.textContent = `${icon("battery")}${batteryText}`;
+    ui.barLeft.innerHTML = `${icon("battery")}<span>${batteryText}</span>`;
     ui.barRight.textContent = `${Number(state.grid) > 0 ? translate("gridImport") : translate("feedIn")} ${formatPower(grid)}`;
   }
   setTiles([

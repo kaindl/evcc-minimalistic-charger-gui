@@ -165,19 +165,19 @@ h1 {
 .tile strong { overflow: hidden; font-size: clamp(14px, 4.8vmin, 22px); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 
 .control-row {
-  display: flex;
-  width: min(100%, 560px);
+  display: grid;
+  width: min(100%, 700px);
   min-width: 0;
   justify-self: center;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
   gap: clamp(4px, 1.5vw, 16px);
 }
 .controls {
   display: flex;
+  grid-column: span 4;
   width: auto;
-  max-width: 460px;
   min-width: 0;
-  flex: 1;
   min-height: clamp(54px, 17vmin, 82px);
   align-items: stretch;
   gap: 5px;
@@ -219,8 +219,8 @@ h1 {
 .loadpoint-navigation[hidden] { display: none; }
 .loadpoint-arrow {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 100%;
+  height: calc(clamp(54px, 17vmin, 82px) - 12px);
   place-items: center;
   padding: 6px;
   border: 0;

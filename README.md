@@ -2,7 +2,9 @@
 
 A compact, responsive web display for evcc. A single Go process serves the UI and proxies its small set of required API calls to evcc; no separate web server or JavaScript dependencies are needed.
 
-The display follows the visual language and data presentation of [evcc-garage-display](https://github.com/tobymarks/evcc-garage-display), adapted from a fixed square screen to responsive browser layouts. Its API fields and charging-mode mappings are derived from that project. This project was created with GitHub Copilot.
+The display is inspired by and based on [evcc-garage-display](https://github.com/tobymarks/evcc-garage-display).
+
+This project was created with GitHub Copilot.
 
 ## Run
 
@@ -52,32 +54,32 @@ Pass options as query parameters on the display URL, for example:
 http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeout=120&theme=dark&lang=de
 ```
 
-| Parameter | Default | Description |
-| --- | --- | --- |
-| `control` | `0` | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled. |
-| `autoSwitch` | `1` | Automatically switch to a newly connected vehicle or a loadpoint whose charging state changed. Set to `0` to disable. As in the source display, automatic switching is suppressed for 60 seconds after user interaction. |
-| `preselect` | none | evcc loadpoint number to return to after manual browsing, **1-based** as in evcc (for example `2`). It must be included by the allow/block list. |
-| `preselectTimeout` | `60` | Seconds without user interaction before returning to `preselect`. `0` disables the return. |
-| `screenTimeout` | `120` | Seconds without charging or interaction before the display goes completely black. `0` keeps it on. With `preselect`, only that loadpoint counts, and the timer runs only while it is displayed. Tap anywhere to wake it. |
-| `theme` | `dark` | `dark` or `light`. |
-| `lang` | browser language | Translation language (`de` or `en`). A regional tag such as `de-CH` uses its base language; unsupported languages fall back to English. |
-| `allowlist` | all loadpoints | Comma-separated evcc loadpoint numbers to show, e.g. `allowlist=1,3`. |
-| `blocklist` | none | Comma-separated evcc loadpoint numbers to hide, e.g. `blocklist=2`. Cannot be used with `allowlist`. |
+| Parameter          | Default          | Description                                                                                                                                                                                                              |
+| ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `control`          | `0`              | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled.                                                                                            |
+| `autoSwitch`       | `1`              | Automatically switch to a newly connected vehicle or a loadpoint whose charging state changed. Set to `0` to disable. As in the source display, automatic switching is suppressed for 60 seconds after user interaction. |
+| `preselect`        | none             | evcc loadpoint number to return to after manual browsing, **1-based** as in evcc (for example `2`). It must be included by the allow/block list.                                                                         |
+| `preselectTimeout` | `60`             | Seconds without user interaction before returning to `preselect`. `0` disables the return.                                                                                                                               |
+| `screenTimeout`    | `120`            | Seconds without charging or interaction before the display goes completely black. `0` keeps it on. With `preselect`, only that loadpoint counts, and the timer runs only while it is displayed. Tap anywhere to wake it. |
+| `theme`            | `dark`           | `dark` or `light`.                                                                                                                                                                                                       |
+| `lang`             | browser language | Translation language (`de` or `en`). A regional tag such as `de-CH` uses its base language; unsupported languages fall back to English.                                                                                  |
+| `allowlist`        | all loadpoints   | Comma-separated evcc loadpoint numbers to show, e.g. `allowlist=1,3`.                                                                                                                                                    |
+| `blocklist`        | none             | Comma-separated evcc loadpoint numbers to hide, e.g. `blocklist=2`. Cannot be used with `allowlist`.                                                                                                                     |
 
 Loadpoints can be switched manually by swiping left/right or clicking the displayed arrows on either side of the mode buttons. The arrows appear when more than one loadpoint is displayed and disable at the first and last loadpoint. Other screen taps do not change the selected loadpoint.
 
 ## Display and controls
 
-The responsive layout scales its spacing and typography with the available viewport and adapts to portrait and landscape aspect ratios. It shows the loadpoint name and time, vehicle, charging power with the vehicle state of charge alongside it, a state-of-charge bar with the lower of the effective and vehicle charging limits (when available), evcc status, solar/grid share, session data, and—when no vehicle is connected and PV data is available—house, solar, and battery flow.
+The responsive layout scales its spacing and typography with the available viewport and adapts to portrait and landscape aspect ratios. It shows the loadpoint name and time, vehicle, charging power with the vehicle state of charge alongside it, a state-of-charge bar with the lower of the effective and vehicle charging limits (when available), evcc status, solar/grid share, session data, and — when no vehicle is connected and PV data is available — house, solar, and battery flow.
 
 By default, the only interaction is switching loadpoints. When `control=1`, the mode buttons map to evcc as follows:
 
-| Button | evcc API behavior |
-| --- | --- |
-| Smart | `alwayscharge/off`, then `mode/smart` (older evcc: `mode/pv`) |
-| Slow | `alwayscharge/on`, then `mode/smart` (older evcc: `mode/minpv`) |
-| Fast | `mode/now` |
-| Off | `mode/off` |
+| Button | evcc API behavior                                               |
+| ------ | --------------------------------------------------------------- |
+| Smart  | `alwayscharge/off`, then `mode/smart` (older evcc: `mode/pv`)   |
+| Slow   | `alwayscharge/on`, then `mode/smart` (older evcc: `mode/minpv`) |
+| Fast   | `mode/now`                                                      |
+| Off    | `mode/off`                                                      |
 
 ## evcc API
 

@@ -84,6 +84,8 @@ const ui = {
   status: document.getElementById("status"),
   flow: document.getElementById("energy-flow"),
   bar: document.getElementById("bar-fill"),
+  feedInBar: document.getElementById("bar-feed-in-fill"),
+  gridBar: document.getElementById("bar-grid-fill"),
   barLeft: document.getElementById("bar-left"),
   barRight: document.getElementById("bar-right"),
   tiles: document.getElementById("tiles"),
@@ -254,6 +256,9 @@ function isHouseView(lp) {
 function setTiles(items) {
   const tileEls = [...ui.tiles.children];
   ui.tiles.hidden = !items;
+  const visibleCount = items?.filter((item) => !item.hidden).length || 0;
+  ui.tiles.classList.toggle("has-two-tiles", visibleCount === 2);
+  ui.tiles.classList.toggle("has-one-tile", visibleCount === 1);
   tileEls.forEach((tile, index) => {
     const item = items?.[index];
     tile.hidden = !item || item.hidden === true;
@@ -284,21 +289,24 @@ function renderHouse(lp, live) {
   else if (threshold > 0) setStatus("smartThreshold", "", { value: formatNumber(threshold / 1000) });
   else setStatus("solarSurplus");
 
-  const flow = batteryAvailable && hasNumber(state.grid);
+  const flow = hasNumber(state.pv) && hasNumber(state.grid);
   ui.flow.hidden = !flow;
   if (flow) {
-    const battery = Math.abs(Number(state.batp) || 0);
-    const grid = Math.abs(Number(state.grid) || 0);
-    const total = battery + grid;
-    const share = total >= 50 ? battery / total : 0;
-    ui.bar.style.width = `${Math.round(share * 100)}%`;
-    ui.bar.style.background = "var(--battery)";
-    ui.flow.classList.toggle("feed-in", Number(state.grid) < -50);
-    const batteryText = battery < 50
-      ? translate(Number(state.bat) >= 99.5 ? "batteryFull" : "batteryPaused")
-      : `${translate(Number(state.batp) < 0 ? "batteryCharging" : "batteryDischarging")} ${formatPower(battery)}`;
-    ui.barLeft.innerHTML = `${icon("battery")}<span>${batteryText}</span>`;
-    ui.barRight.textContent = `${Number(state.grid) > 0 ? translate("gridImport") : translate("feedIn")} ${formatPower(grid)}`;
+    const pvPower = Math.max(0, Number(state.pv));
+    const gridPower = Number(state.grid);
+    const batteryPower = hasNumber(state.batp) ? Number(state.batp) : 0;
+    const batteryCharging = Math.max(0, -batteryPower);
+    const batteryDischarging = Math.max(0, batteryPower);
+    const feedIn = Math.max(0, -gridPower);
+    const gridImport = Math.max(0, gridPower);
+    const solarUsed = Math.max(0, pvPower + batteryDischarging - batteryCharging - feedIn);
+    const total = solarUsed + feedIn + gridImport;
+    const percent = (value) => total > 0 ? `${(value / total) * 100}%` : "0%";
+    ui.bar.style.width = percent(solarUsed);
+    ui.feedInBar.style.width = percent(feedIn);
+    ui.gridBar.style.width = percent(gridImport);
+    ui.barLeft.textContent = translate("solarUsed", { value: formatPower(solarUsed) });
+    ui.barRight.textContent = `${translate(gridPower > 0 ? "gridImport" : "feedIn")} ${formatPower(gridPower > 0 ? gridImport : feedIn)}`;
   }
   setTiles([
     { label: translate("solar"), value: formatPower(Number(state.pv) || 0) },
@@ -340,7 +348,8 @@ function renderLoadpoint(lp) {
       if (!ui.flow.hidden) {
         const solar = Math.min(100, Math.max(0, Math.round(Number(lp.green) * 100)));
         ui.bar.style.width = `${solar}%`;
-        ui.bar.style.background = "var(--solar)";
+        ui.feedInBar.style.width = "0";
+        ui.gridBar.style.width = "0";
         ui.barLeft.textContent = translate("now", { value: solar });
         ui.barRight.textContent = translate("gridPercent", { value: 100 - solar });
       }

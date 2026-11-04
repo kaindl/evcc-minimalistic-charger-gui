@@ -36,6 +36,7 @@
   "lastUpdate": "evcc unreachable · last update {time}",
   "notConfigured": "This number does not exist in evcc",
   "now": "Now {value}% solar",
+  "solarUsed": "Solar used {value}",
   "gridPercent": "{value}% grid",
   "batteryFull": "Battery full",
   "batteryPaused": "Battery paused",

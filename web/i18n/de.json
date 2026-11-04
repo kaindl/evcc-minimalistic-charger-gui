@@ -36,6 +36,7 @@
   "lastUpdate": "evcc nicht erreichbar · Stand {time}",
   "notConfigured": "Diese Nummer gibt es in evcc nicht",
   "now": "Jetzt {value} % Sonne",
+  "solarUsed": "Sonne genutzt {value}",
   "gridPercent": "{value} % Netz",
   "batteryFull": "Akku voll",
   "batteryPaused": "Akku pausiert",

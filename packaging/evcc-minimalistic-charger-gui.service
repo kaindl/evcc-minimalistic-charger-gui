@@ -1,0 +1,22 @@
+[Unit]
+Description=evcc minimalistic charger GUI
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=/etc/default/evcc-minimalistic-charger-gui.env
+ExecStart=/usr/bin/evcc-minimalistic-charger-gui --port ${PORT} --evcc ${EVCC_URL}
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

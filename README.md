@@ -21,6 +21,29 @@ go build -o evcc-display .
 
 The Go process serves the embedded HTML, CSS, JavaScript, and translations and makes same-origin requests to evcc. This avoids browser CORS requirements. The browser should be able to reach this app; only the app process needs to reach evcc.
 
+## Build, install, and Debian package
+
+The Makefile builds a Linux executable and can install it with a systemd unit and configuration file:
+
+```sh
+make
+sudo make install
+sudo editor /etc/default/evcc-minimalistic-charger-gui.env
+sudo systemctl daemon-reload
+sudo systemctl enable --now evcc-minimalistic-charger-gui
+```
+
+Set `EVCC_URL` to the evcc server URL and `PORT` to the display's listening port in `/etc/default/evcc-minimalistic-charger-gui.env`. The service runs with a dynamically allocated unprivileged user. To install into a staging directory instead of the host system, use `make install DESTDIR=/path/to/stage`.
+
+Create a Debian package for the current machine's architecture with:
+
+```sh
+make deb
+sudo apt install ./build/evcc-minimalistic-charger-gui_0.1.0_$(dpkg --print-architecture).deb
+```
+
+The package installs the same systemd unit and configuration file. `VERSION` can be overridden when building, for example `make deb VERSION=1.2.3`. After installation, update the config file if needed, then enable and start the service with `sudo systemctl enable --now evcc-minimalistic-charger-gui`.
+
 ## URL options
 
 Pass options as query parameters on the display URL, for example:

@@ -70,6 +70,10 @@ const ui = {
   battery: document.getElementById("battery"),
   connection: document.getElementById("connection-icon"),
   vehicle: document.getElementById("vehicle"),
+  soc: document.getElementById("soc-progress"),
+  socCurrent: document.getElementById("soc-current"),
+  socLimit: document.getElementById("soc-limit"),
+  socMarker: document.querySelector(".soc-marker"),
   power: document.getElementById("power"),
   unit: document.getElementById("power-unit"),
   powerIcon: document.getElementById("power-icon"),
@@ -195,6 +199,7 @@ function updateNavigation() {
     return dot;
   }));
   const multiple = points.length > 1;
+  document.querySelector(".control-row").classList.toggle("has-multiple-loadpoints", multiple);
   ui.navigation.hidden = !multiple;
   ui.previousLoadpoint.hidden = !multiple;
   ui.nextLoadpoint.hidden = !multiple;
@@ -311,6 +316,7 @@ function renderLoadpoint(lp) {
     ? `${icon("battery")} ${Math.round(Number(state.bat))} %`
     : "";
   ui.battery.hidden = !ui.battery.textContent;
+  renderSocProgress(lp, showPower && !house);
 
   if (house) {
     renderHouse(lp, live);
@@ -357,6 +363,34 @@ function renderLoadpoint(lp) {
     button.setAttribute("aria-pressed", String(button.dataset.mode === (pendingMode || mode)));
     button.disabled = !config.control || !live;
   });
+}
+
+function renderSocProgress(lp, showPower) {
+  const soc = Number(lp.vehicleSoc);
+  const effectiveLimit = hasNumber(lp.effectiveLimitSoc) ? Number(lp.effectiveLimitSoc) : null;
+  const vehicleLimit = hasNumber(lp.vehicleLimitSoc) ? Number(lp.vehicleLimitSoc) : null;
+  const validLimit = (value) => value !== null && value > 0 && value <= 100;
+  const useVehicleLimit = validLimit(vehicleLimit)
+    && (!validLimit(effectiveLimit) || vehicleLimit <= effectiveLimit);
+  const limit = useVehicleLimit ? vehicleLimit : validLimit(effectiveLimit) ? effectiveLimit : null;
+  const available = showPower && hasNumber(lp.vehicleSoc) && soc >= 0 && soc <= 100;
+  ui.soc.hidden = !available;
+  if (!available) return;
+
+  const currentPercent = Math.min(100, Math.max(0, soc));
+  ui.soc.style.setProperty("--soc-progress", `${currentPercent}%`);
+  ui.socCurrent.textContent = translate("socValue", { value: Math.round(currentPercent) });
+  ui.socLimit.hidden = limit === null;
+  ui.socMarker.hidden = limit === null;
+  if (limit !== null) {
+    const limitPercent = Math.min(100, Math.max(0, limit));
+    ui.soc.style.setProperty("--soc-limit", `${limitPercent}%`);
+    ui.socLimit.textContent = translate(useVehicleLimit ? "vehicleSocLimit" : "socLimit", {
+      value: Math.round(limitPercent),
+    });
+  }
+  ui.soc.setAttribute("aria-label", [ui.socCurrent.textContent, limit === null ? "" : ui.socLimit.textContent]
+    .filter(Boolean).join(", "));
 }
 
 function renderStatus(lp, live, mode) {
@@ -443,7 +477,7 @@ function renderUnavailable() {
 }
 
 function loadpointFilter() {
-  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
+  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,effectiveLimitSoc:.value.effectiveLimitSoc,vehicleLimitSoc:.value.vehicleLimitSoc,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
 }
 
 async function poll() {

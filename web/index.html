@@ -23,6 +23,16 @@
 
       <section class="content" aria-live="polite">
         <div id="vehicle" class="vehicle"></div>
+        <div id="soc-progress" class="soc-progress" role="img" hidden>
+          <div class="soc-values">
+            <span id="soc-current"></span>
+            <span id="soc-limit" hidden></span>
+          </div>
+          <div class="soc-track">
+            <span class="soc-fill"></span>
+            <span class="soc-marker" hidden></span>
+          </div>
+        </div>
         <div class="power-line">
           <span id="power" class="power">—</span>
           <span id="power-unit" class="power-unit">kW</span>

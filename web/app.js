@@ -345,7 +345,7 @@ function renderLoadpoint(lp) {
 
   ui.controls.querySelectorAll("button").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.mode === (pendingMode || mode)));
-    button.disabled = !live;
+    button.disabled = !config.control || !live;
   });
 }
 
@@ -495,6 +495,7 @@ async function poll() {
 }
 
 async function postMode(mode) {
+  if (!config.control) return;
   const lp = currentPoint();
   if (!lp) return;
   lastUserActivity = Date.now();
@@ -623,7 +624,6 @@ async function start() {
     });
     config = readConfig();
     document.documentElement.dataset.theme = config.theme;
-    ui.controls.hidden = !config.control;
     updateClock();
     await poll();
     window.setInterval(poll, 3000);

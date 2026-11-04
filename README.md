@@ -31,7 +31,7 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 
 | Parameter | Default | Description |
 | --- | --- | --- |
-| `control` | `0` | Set to `1` to show the **Smart**, **Slow**, **Fast**, and **Off** charging-mode buttons. |
+| `control` | `0` | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled. |
 | `autoSwitch` | `1` | Automatically switch to a newly connected vehicle or a loadpoint whose charging state changed. Set to `0` to disable. As in the source display, automatic switching is suppressed for 60 seconds after user interaction. |
 | `preselect` | none | evcc loadpoint number to return to after manual browsing, **1-based** as in evcc (for example `2`). It must be included by the allow/block list. |
 | `preselectTimeout` | `60` | Seconds without user interaction before returning to `preselect`. `0` disables the return. |

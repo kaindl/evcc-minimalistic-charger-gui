@@ -196,6 +196,7 @@ h1 {
 }
 .controls button[aria-pressed="true"] { background: var(--active-bg); color: var(--active-fg); }
 .controls button:active { background: var(--pressed); }
+.controls button:disabled { cursor: default; opacity: .48; }
 .controls strong { font-size: clamp(12px, 4.1vmin, 20px); font-weight: 600; line-height: 1.15; }
 .controls small { font-size: clamp(8px, 2.8vmin, 13px); line-height: 1.1; }
 

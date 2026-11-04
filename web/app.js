@@ -71,9 +71,13 @@ const ui = {
   connection: document.getElementById("connection-icon"),
   vehicle: document.getElementById("vehicle"),
   soc: document.getElementById("soc-progress"),
-  socCurrent: document.getElementById("soc-current"),
+  socValues: document.getElementById("soc-values"),
   socLimit: document.getElementById("soc-limit"),
   socMarker: document.querySelector(".soc-marker"),
+  socGroup: document.getElementById("soc-group"),
+  socValue: document.getElementById("soc-value"),
+  valueDivider: document.getElementById("value-divider"),
+  powerLine: document.getElementById("power-line"),
   power: document.getElementById("power"),
   unit: document.getElementById("power-unit"),
   powerIcon: document.getElementById("power-icon"),
@@ -324,8 +328,7 @@ function renderLoadpoint(lp) {
     ui.vehicle.hidden = !showPower;
     if (showPower) {
       const vehicle = lp.vehicleTitle || translate("vehicle");
-      const soc = Number(lp.vehicleSoc) > 0 ? ` · ${Math.round(Number(lp.vehicleSoc))} %` : "";
-      ui.vehicle.innerHTML = `${icon("car")}<span>${escapeHTML(vehicle + soc)}</span>`;
+      ui.vehicle.innerHTML = `${icon("car")}<span>${escapeHTML(vehicle)}</span>`;
       ui.power.textContent = formatNumber((Number(lp.chargePower) || 0) / 1000);
       ui.power.className = `power${live && lp.charging ? "" : " muted"}`;
       ui.unit.hidden = false;
@@ -375,13 +378,19 @@ function renderSocProgress(lp, showPower) {
   const limit = useVehicleLimit ? vehicleLimit : validLimit(effectiveLimit) ? effectiveLimit : null;
   const available = showPower && hasNumber(lp.vehicleSoc) && soc >= 0 && soc <= 100;
   ui.soc.hidden = !available;
+  ui.socGroup.hidden = !available;
+  ui.valueDivider.hidden = !available;
+  ui.socValue.hidden = !available;
+  ui.powerLine.classList.toggle("has-soc", available);
   if (!available) return;
 
   const currentPercent = Math.min(100, Math.max(0, soc));
   ui.soc.style.setProperty("--soc-progress", `${currentPercent}%`);
-  ui.socCurrent.textContent = translate("socValue", { value: Math.round(currentPercent) });
+  ui.socValue.textContent = String(Math.round(currentPercent));
+  ui.socValue.hidden = false;
   ui.socLimit.hidden = limit === null;
   ui.socMarker.hidden = limit === null;
+  ui.socValues.hidden = limit === null;
   if (limit !== null) {
     const limitPercent = Math.min(100, Math.max(0, limit));
     ui.soc.style.setProperty("--soc-limit", `${limitPercent}%`);
@@ -389,8 +398,7 @@ function renderSocProgress(lp, showPower) {
       value: Math.round(limitPercent),
     });
   }
-  ui.soc.setAttribute("aria-label", [ui.socCurrent.textContent, limit === null ? "" : ui.socLimit.textContent]
-    .filter(Boolean).join(", "));
+  ui.soc.setAttribute("aria-label", limit === null ? "" : ui.socLimit.textContent);
 }
 
 function renderStatus(lp, live, mode) {

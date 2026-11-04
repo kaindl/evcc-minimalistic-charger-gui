@@ -138,10 +138,12 @@ h1 {
 .soc-values {
   display: flex;
   justify-content: space-between;
+  min-height: 1.15em;
   margin-bottom: 5px;
   color: var(--muted);
   font-size: clamp(10px, 3.2vmin, 14px);
 }
+.soc-values[hidden] { display: none; }
 .soc-track {
   position: relative;
   height: clamp(8px, 2.8vmin, 14px);
@@ -168,9 +170,14 @@ h1 {
 }
 .soc-marker[hidden] { display: none; }
 
-.power-line { display: flex; align-items: baseline; justify-content: center; gap: clamp(4px, 1.5vw, 12px); white-space: nowrap; }
+.power-line { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 4vw, 28px); white-space: nowrap; }
+.value-group { display: inline-flex; align-items: baseline; gap: .08em; }
+.value-group[hidden] { display: none; }
 .power { font-size: clamp(58px, min(22vw, 23vh), 118px); font-weight: 600; letter-spacing: -0.065em; line-height: 1; }
+.soc-value { color: var(--text); font-size: clamp(58px, min(22vw, 23vh), 118px); font-weight: 600; letter-spacing: -0.065em; line-height: 1; }
+.power-line.has-soc .power, .power-line.has-soc .soc-value { font-size: clamp(38px, min(14vw, 20vh), 118px); }
 .power-unit { color: var(--muted); font-size: clamp(20px, 7vmin, 34px); font-weight: 500; }
+.value-divider { align-self: center; color: var(--muted); font-size: clamp(24px, 8vmin, 42px); line-height: 1; }
 .power-icon { align-self: center; color: var(--solar); font-size: clamp(27px, 9vmin, 48px); }
 .power-icon.sun { color: var(--solar); }
 .power.muted { color: var(--muted); }

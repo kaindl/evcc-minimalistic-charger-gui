@@ -24,8 +24,7 @@
       <section class="content" aria-live="polite">
         <div id="vehicle" class="vehicle"></div>
         <div id="soc-progress" class="soc-progress" role="img" hidden>
-          <div class="soc-values">
-            <span id="soc-current"></span>
+          <div id="soc-values" class="soc-values" hidden>
             <span id="soc-limit" hidden></span>
           </div>
           <div class="soc-track">
@@ -33,10 +32,17 @@
             <span class="soc-marker" hidden></span>
           </div>
         </div>
-        <div class="power-line">
-          <span id="power" class="power">—</span>
-          <span id="power-unit" class="power-unit">kW</span>
-          <span id="power-icon" class="power-icon" aria-hidden="true"></span>
+        <div id="power-line" class="power-line">
+          <span id="soc-group" class="value-group" hidden>
+            <span id="soc-value" class="soc-value"></span>
+            <span class="power-unit">% SoC</span>
+          </span>
+          <span id="value-divider" class="value-divider" aria-hidden="true" hidden>·</span>
+          <span class="value-group">
+            <span id="power" class="power">—</span>
+            <span id="power-unit" class="power-unit">kW</span>
+            <span id="power-icon" class="power-icon" aria-hidden="true"></span>
+          </span>
         </div>
         <p id="status" class="status"></p>
         <div id="energy-flow" class="energy-flow" hidden>

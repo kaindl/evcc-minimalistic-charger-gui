@@ -45,7 +45,7 @@ Loadpoints can be switched manually by swiping left/right or clicking the displa
 
 ## Display and controls
 
-The responsive layout scales its spacing and typography with the available viewport and adapts to portrait and landscape aspect ratios. It shows the loadpoint name and time, vehicle, a state-of-charge bar with the lower of the effective and vehicle charging limits (when available), charging power, evcc status, solar/grid share, session data, and—when no vehicle is connected and PV data is available—house, solar, and battery flow.
+The responsive layout scales its spacing and typography with the available viewport and adapts to portrait and landscape aspect ratios. It shows the loadpoint name and time, vehicle, charging power with the vehicle state of charge alongside it, a state-of-charge bar with the lower of the effective and vehicle charging limits (when available), evcc status, solar/grid share, session data, and—when no vehicle is connected and PV data is available—house, solar, and battery flow.
 
 By default, the only interaction is switching loadpoints. When `control=1`, the mode buttons map to evcc as follows:
 

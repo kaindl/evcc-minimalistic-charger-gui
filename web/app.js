@@ -279,7 +279,7 @@ function renderHouse(lp, live) {
     const updated = lastSuccess
       ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(lastSuccess))
       : "";
-    setStatus(lastSuccess ? "lastUpdate" : "connecting", "", { time: updated });
+    setStatus(lastSuccess ? "lastUpdate" : "connecting", "error", { time: updated });
   } else if (threshold > 0 && surplus >= threshold) setStatus("enoughSolar", "good");
   else if (threshold > 0) setStatus("smartThreshold", "", { value: formatNumber(threshold / 1000) });
   else setStatus("solarSurplus");
@@ -406,7 +406,7 @@ function renderStatus(lp, live, mode) {
     const updated = lastSuccess
       ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(lastSuccess))
       : "";
-    setStatus(lastSuccess ? "lastUpdate" : "connecting", "", { time: updated });
+    setStatus(lastSuccess ? "lastUpdate" : "connecting", "error", { time: updated });
     return;
   }
   if (pendingMode) return setStatus("modePending");

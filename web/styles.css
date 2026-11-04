@@ -164,11 +164,21 @@ h1 {
 .tile span { overflow: hidden; color: var(--muted); font-size: clamp(9px, 3.3vmin, 14px); letter-spacing: .04em; text-overflow: ellipsis; white-space: nowrap; }
 .tile strong { overflow: hidden; font-size: clamp(14px, 4.8vmin, 22px); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 
+.control-row {
+  display: flex;
+  width: min(100%, 560px);
+  min-width: 0;
+  justify-self: center;
+  align-items: center;
+  gap: clamp(4px, 1.5vw, 16px);
+}
 .controls {
   display: flex;
-  width: min(72%, 460px);
+  width: auto;
+  max-width: 460px;
+  min-width: 0;
+  flex: 1;
   min-height: clamp(54px, 17vmin, 82px);
-  justify-self: center;
   align-items: stretch;
   gap: 5px;
   padding: 5px;
@@ -205,7 +215,6 @@ h1 {
   min-height: 36px;
   align-items: center;
   justify-self: center;
-  gap: clamp(12px, 4vw, 24px);
 }
 .loadpoint-navigation[hidden] { display: none; }
 .loadpoint-arrow {
@@ -221,6 +230,7 @@ h1 {
   cursor: pointer;
   touch-action: manipulation;
 }
+.loadpoint-arrow[hidden] { display: none; }
 .loadpoint-arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
 .loadpoint-arrow:active { background: var(--pressed); }
 .loadpoint-arrow:disabled { cursor: default; opacity: .35; }

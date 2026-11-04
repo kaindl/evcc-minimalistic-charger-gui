@@ -41,7 +41,7 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 | `allowlist` | all loadpoints | Comma-separated evcc loadpoint numbers to show, e.g. `allowlist=1,3`. |
 | `blocklist` | none | Comma-separated evcc loadpoint numbers to hide, e.g. `blocklist=2`. Cannot be used with `allowlist`. |
 
-Loadpoints can be switched manually by swiping left/right or clicking the displayed left/right arrow controls below the mode buttons. The arrows appear when more than one loadpoint is displayed and disable at the first and last loadpoint. Other screen taps do not change the selected loadpoint.
+Loadpoints can be switched manually by swiping left/right or clicking the displayed arrows on either side of the mode buttons. The arrows appear when more than one loadpoint is displayed and disable at the first and last loadpoint. Other screen taps do not change the selected loadpoint.
 
 ## Display and controls
 

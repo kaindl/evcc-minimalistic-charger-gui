@@ -196,6 +196,8 @@ function updateNavigation() {
   }));
   const multiple = points.length > 1;
   ui.navigation.hidden = !multiple;
+  ui.previousLoadpoint.hidden = !multiple;
+  ui.nextLoadpoint.hidden = !multiple;
   ui.previousLoadpoint.disabled = current === 0;
   ui.nextLoadpoint.disabled = current === points.length - 1;
 }

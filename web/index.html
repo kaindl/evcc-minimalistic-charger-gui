@@ -49,7 +49,15 @@
         <button type="button" data-mode="fast" disabled><strong data-i18n="fast"></strong><small data-i18n="fullPower"></small></button>
         <button type="button" data-mode="off" disabled><strong data-i18n="off"></strong><small data-i18n="stopCharging"></small></button>
       </nav>
-      <div id="dots" class="dots" aria-hidden="true"></div>
+      <nav id="loadpoint-navigation" class="loadpoint-navigation" aria-label="Loadpoint navigation" hidden>
+        <button id="previous-loadpoint" class="loadpoint-arrow" type="button" aria-label="Previous loadpoint">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div id="dots" class="dots" aria-hidden="true"></div>
+        <button id="next-loadpoint" class="loadpoint-arrow" type="button" aria-label="Next loadpoint">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </nav>
       <div id="screen-off" class="screen-off" hidden></div>
       <div id="error" class="error" role="alert" hidden></div>
     </main>

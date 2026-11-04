@@ -200,8 +200,31 @@ h1 {
 .controls strong { font-size: clamp(12px, 4.1vmin, 20px); font-weight: 600; line-height: 1.15; }
 .controls small { font-size: clamp(8px, 2.8vmin, 13px); line-height: 1.1; }
 
+.loadpoint-navigation {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-self: center;
+  gap: clamp(12px, 4vw, 24px);
+}
+.loadpoint-navigation[hidden] { display: none; }
+.loadpoint-arrow {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--box);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.loadpoint-arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+.loadpoint-arrow:active { background: var(--pressed); }
+.loadpoint-arrow:disabled { cursor: default; opacity: .35; }
 .dots { display: flex; min-height: 8px; align-items: center; justify-self: center; gap: 12px; }
-.dots[hidden] { display: none; }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); opacity: .5; }
 .dot.active { opacity: 1; }
 

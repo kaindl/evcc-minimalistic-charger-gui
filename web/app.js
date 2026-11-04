@@ -80,6 +80,9 @@ const ui = {
   barRight: document.getElementById("bar-right"),
   tiles: document.getElementById("tiles"),
   controls: document.getElementById("controls"),
+  navigation: document.getElementById("loadpoint-navigation"),
+  previousLoadpoint: document.getElementById("previous-loadpoint"),
+  nextLoadpoint: document.getElementById("next-loadpoint"),
   dots: document.getElementById("dots"),
   screenOff: document.getElementById("screen-off"),
 };
@@ -122,6 +125,8 @@ function translate(key, values = {}) {
 
 const english = {
   smart: "Smart", slow: "Slow", fast: "Fast", off: "Off", stopCharging: "stop charging", solarOnly: "solar only",
+  loadpointNavigation: "Loadpoint navigation",
+  previousLoadpoint: "Previous loadpoint", nextLoadpoint: "Next loadpoint",
   alwaysCharge: "always charging", fullPower: "full power", noVehicle: "No vehicle",
   charging: "Charging", notFound: "Not found", connecting: "Connecting …",
   noData: "No data", noWifi: "No Wi-Fi", chargingPointOff: "Charging point is off – choose a mode",
@@ -189,7 +194,10 @@ function updateNavigation() {
     dot.className = `dot${index === current ? " active" : ""}`;
     return dot;
   }));
-  ui.dots.hidden = points.length < 2;
+  const multiple = points.length > 1;
+  ui.navigation.hidden = !multiple;
+  ui.previousLoadpoint.disabled = current === 0;
+  ui.nextLoadpoint.disabled = current === points.length - 1;
 }
 
 function setCurrent(index, source = "manual") {
@@ -556,16 +564,10 @@ function handlePointerUp(event) {
   }
   const dx = event.clientX - pointerStart.x;
   const dy = event.clientY - pointerStart.y;
-  const start = pointerStart;
   pointerStart = null;
   if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy)) {
     moveBy(dx < 0 ? 1 : -1);
-    return;
   }
-  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) return;
-  const width = display.clientWidth;
-  if (start.x <= width * 0.14) moveBy(-1);
-  else if (start.x >= width * 0.86) moveBy(1);
 }
 
 function runTimeouts() {
@@ -622,6 +624,9 @@ async function start() {
     document.querySelectorAll("[data-i18n]").forEach((element) => {
       element.textContent = translate(element.dataset.i18n);
     });
+    ui.previousLoadpoint.setAttribute("aria-label", translate("previousLoadpoint"));
+    ui.nextLoadpoint.setAttribute("aria-label", translate("nextLoadpoint"));
+    ui.navigation.setAttribute("aria-label", translate("loadpointNavigation"));
     config = readConfig();
     document.documentElement.dataset.theme = config.theme;
     updateClock();
@@ -641,6 +646,8 @@ async function start() {
 display.addEventListener("pointerdown", handlePointerDown);
 display.addEventListener("pointerup", handlePointerUp);
 display.addEventListener("pointercancel", () => { pointerStart = null; });
+ui.previousLoadpoint.addEventListener("click", () => moveBy(-1));
+ui.nextLoadpoint.addEventListener("click", () => moveBy(1));
 ui.controls.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-mode]");
   if (button && !button.disabled) postMode(button.dataset.mode);

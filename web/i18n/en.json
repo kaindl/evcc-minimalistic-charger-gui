@@ -2,6 +2,8 @@
   "smart": "Smart",
   "slow": "Slow",
   "fast": "Fast",
+  "off": "Off",
+  "stopCharging": "stop charging",
   "solarOnly": "solar only",
   "alwaysCharge": "always charging",
   "fullPower": "full power",

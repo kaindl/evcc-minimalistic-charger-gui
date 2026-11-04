@@ -121,7 +121,7 @@ function translate(key, values = {}) {
 }
 
 const english = {
-  smart: "Smart", slow: "Slow", fast: "Fast", solarOnly: "solar only",
+  smart: "Smart", slow: "Slow", fast: "Fast", off: "Off", stopCharging: "stop charging", solarOnly: "solar only",
   alwaysCharge: "always charging", fullPower: "full power", noVehicle: "No vehicle",
   charging: "Charging", notFound: "Not found", connecting: "Connecting …",
   noData: "No data", noWifi: "No Wi-Fi", chargingPointOff: "Charging point is off – choose a mode",
@@ -341,6 +341,7 @@ function renderLoadpoint(lp) {
     }
     renderStatus(lp, live, mode);
   }
+  if (live && lp.mode === "off") setStatus("chargingPointOff", "warn");
 
   ui.controls.querySelectorAll("button").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.mode === (pendingMode || mode)));
@@ -357,7 +358,6 @@ function renderStatus(lp, live, mode) {
     return;
   }
   if (pendingMode) return setStatus("modePending");
-  if (lp.mode === "off") return setStatus("chargingPointOff", "warn");
   if (!lp.connected) {
     if (hasNumber(lp.root.pv) && Number(lp.root.pv) >= 0) {
       const surplus = solarSurplus(lp.root);
@@ -397,6 +397,7 @@ function setStatus(key, style = "", values = {}) {
 }
 
 function modeFor(lp) {
+  if (lp.mode === "off") return "off";
   if (lp.mode === "now") return "fast";
   if (lp.mode === "minpv") return "slow";
   if (lp.mode === "pv") return "smart";
@@ -502,7 +503,9 @@ async function postMode(mode) {
   render();
   const base = `/api/loadpoints/${lp.number}`;
   try {
-    if (mode === "fast") {
+    if (mode === "off") {
+      await requestPost(`${base}/mode/off`);
+    } else if (mode === "fast") {
       await requestPost(`${base}/mode/now`);
     } else {
       const always = mode === "slow";

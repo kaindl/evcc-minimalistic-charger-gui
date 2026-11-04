@@ -19,6 +19,7 @@ func TestAllowedAPIRequest(t *testing.T) {
 		{"state query", http.MethodGet, "/api/state", "jq=%7B%7D", true},
 		{"state post", http.MethodPost, "/api/state", "", false},
 		{"mode post", http.MethodPost, "/api/loadpoints/2/mode/now", "", true},
+		{"off mode post", http.MethodPost, "/api/loadpoints/2/mode/off", "", true},
 		{"always-charge post", http.MethodPost, "/api/loadpoints/1/alwayscharge/off", "", true},
 		{"mode get", http.MethodGet, "/api/loadpoints/1/mode/now", "", false},
 		{"unknown endpoint", http.MethodPost, "/api/config", "", false},

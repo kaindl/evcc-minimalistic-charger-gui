@@ -219,11 +219,11 @@ h1 {
 .loadpoint-navigation[hidden] { display: none; }
 .loadpoint-arrow {
   display: grid;
-  width: 100%;
+  width: calc(clamp(54px, 17vmin, 82px) - 12px);
   height: calc(clamp(54px, 17vmin, 82px) - 12px);
   place-items: center;
   padding: 6px;
-  border: 0;
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--box);
   color: var(--text);

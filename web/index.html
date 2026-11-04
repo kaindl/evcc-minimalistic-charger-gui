@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="dark light">
+    <title>evcc display</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main id="display" class="display">
+      <header class="header">
+        <div class="title-line">
+          <span id="connection-icon" class="connection-icon" aria-hidden="true"></span>
+          <h1 id="loadpoint-title">evcc</h1>
+        </div>
+        <div class="header-meta">
+          <span id="battery" class="battery"></span>
+          <time id="clock"></time>
+        </div>
+      </header>
+
+      <section class="content" aria-live="polite">
+        <div id="vehicle" class="vehicle"></div>
+        <div class="power-line">
+          <span id="power" class="power">—</span>
+          <span id="power-unit" class="power-unit">kW</span>
+          <span id="power-icon" class="power-icon" aria-hidden="true"></span>
+        </div>
+        <p id="status" class="status"></p>
+        <div id="energy-flow" class="energy-flow" hidden>
+          <div class="bar"><span id="bar-fill"></span></div>
+          <div class="bar-labels">
+            <span id="bar-left"></span>
+            <span id="bar-right"></span>
+          </div>
+        </div>
+        <div id="tiles" class="tiles">
+          <article class="tile"><span id="tile-label-0"></span><strong id="tile-value-0"></strong></article>
+          <article class="tile"><span id="tile-label-1"></span><strong id="tile-value-1"></strong></article>
+          <article class="tile"><span id="tile-label-2"></span><strong id="tile-value-2"></strong></article>
+        </div>
+      </section>
+
+      <nav id="controls" class="controls" aria-label="Charging mode" hidden>
+        <button type="button" data-mode="smart"><strong data-i18n="smart"></strong><small data-i18n="solarOnly"></small></button>
+        <button type="button" data-mode="slow"><strong data-i18n="slow"></strong><small data-i18n="alwaysCharge"></small></button>
+        <button type="button" data-mode="fast"><strong data-i18n="fast"></strong><small data-i18n="fullPower"></small></button>
+      </nav>
+      <div id="dots" class="dots" aria-hidden="true"></div>
+      <div id="screen-off" class="screen-off" hidden></div>
+      <div id="error" class="error" role="alert" hidden></div>
+    </main>
+  </body>
+</html>

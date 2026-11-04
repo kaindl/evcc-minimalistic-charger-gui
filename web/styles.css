@@ -169,15 +169,16 @@ h1 {
   width: min(100%, 700px);
   min-width: 0;
   justify-self: center;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  --arrow-size: calc(clamp(54px, 17vmin, 82px) - 12px);
+  grid-template-columns: var(--arrow-size) minmax(0, 1fr) var(--arrow-size);
   align-items: center;
   gap: clamp(4px, 1.5vw, 16px);
 }
 .controls {
   display: flex;
-  grid-column: span 4;
-  width: auto;
+  width: min(100%, 460px);
   min-width: 0;
+  justify-self: center;
   min-height: clamp(54px, 17vmin, 82px);
   align-items: stretch;
   gap: 5px;
@@ -219,8 +220,8 @@ h1 {
 .loadpoint-navigation[hidden] { display: none; }
 .loadpoint-arrow {
   display: grid;
-  width: calc(clamp(54px, 17vmin, 82px) - 12px);
-  height: calc(clamp(54px, 17vmin, 82px) - 12px);
+  width: var(--arrow-size);
+  height: var(--arrow-size);
   place-items: center;
   padding: 6px;
   border: 1px solid var(--border);

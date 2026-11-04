@@ -471,6 +471,7 @@ function render() {
 }
 
 function renderUnavailable() {
+  updateNavigation();
   ui.title.textContent = "evcc";
   ui.connection.innerHTML = icon("alert");
   ui.vehicle.hidden = true;

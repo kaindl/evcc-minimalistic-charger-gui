@@ -79,7 +79,7 @@ body {
 .header {
   justify-content: space-between;
   min-width: 0;
-  min-height: 1.5em;
+  height: clamp(24px, 4.5vmin, 30px);
   gap: 12px;
 }
 
@@ -107,14 +107,22 @@ h1 {
 .battery { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 
 .content {
-  display: flex;
+  display: grid;
   min-height: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  grid-template-rows:
+    clamp(24px, 4.5vmin, 30px)
+    clamp(32px, calc(2.8vmin + 22px), 38px)
+    clamp(58px, min(22vw, 23vh), 118px)
+    clamp(24px, 4.5vmin, 30px)
+    clamp(34px, calc(2.8vmin + 23px), 42px)
+    clamp(49px, 15vmin, 68px);
+  gap: clamp(4px, 1.4vh, 12px);
+  align-content: center;
+  justify-items: center;
   overflow: hidden;
   text-align: center;
 }
+.content > * { min-width: 0; }
 
 .vehicle {
   display: flex;
@@ -122,19 +130,20 @@ h1 {
   justify-content: center;
   gap: 8px;
   max-width: 100%;
-  margin-bottom: clamp(0px, 1.1vh, 8px);
+  margin: 0;
   overflow: hidden;
   color: var(--muted);
   font-size: clamp(14px, 4.5vmin, 22px);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.vehicle[hidden] { visibility: hidden; }
 
 .soc-progress {
   width: 100%;
-  margin: 0 0 clamp(10px, 2.2vh, 18px);
+  margin: 0;
 }
-.soc-progress[hidden] { display: none; }
+.soc-progress[hidden] { display: block; visibility: hidden; }
 .soc-values {
   display: flex;
   justify-content: space-between;
@@ -143,7 +152,7 @@ h1 {
   color: var(--muted);
   font-size: clamp(10px, 3.2vmin, 14px);
 }
-.soc-values[hidden] { display: none; }
+.soc-values[hidden] { visibility: hidden; }
 .soc-track {
   position: relative;
   height: clamp(8px, 2.8vmin, 14px);
@@ -170,7 +179,7 @@ h1 {
 }
 .soc-marker[hidden] { display: none; }
 
-.power-line { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 4vw, 28px); white-space: nowrap; }
+.power-line { display: flex; min-height: clamp(58px, min(22vw, 23vh), 118px); align-items: center; justify-content: center; gap: clamp(10px, 4vw, 28px); white-space: nowrap; }
 .value-group { display: inline-flex; align-items: baseline; gap: .08em; }
 .value-group[hidden] { display: none; }
 .power { font-size: clamp(58px, min(22vw, 23vh), 118px); font-weight: 600; letter-spacing: -0.065em; line-height: 1; }
@@ -185,7 +194,7 @@ h1 {
 .status {
   max-width: 100%;
   min-height: 1.25em;
-  margin: clamp(7px, 1.6vh, 14px) 0 0;
+  margin: 0;
   overflow: hidden;
   color: var(--muted);
   font-size: clamp(13px, 4.5vmin, 22px);
@@ -196,17 +205,18 @@ h1 {
 .status.warn { color: var(--warn); }
 .status.error { color: var(--error); }
 
-.energy-flow { width: 100%; margin-top: clamp(12px, 3vh, 22px); }
-.energy-flow[hidden] { display: none; }
+.energy-flow { width: 100%; margin: 0; }
+.energy-flow[hidden] { display: block; visibility: hidden; }
 .bar { height: clamp(8px, 2.8vmin, 14px); overflow: hidden; border-radius: 999px; background: var(--grid); }
 .energy-flow.feed-in .bar { background: var(--feed-in); }
 .bar > span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--solar); }
-.bar-labels { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; color: var(--muted); font-size: clamp(10px, 3.5vmin, 16px); }
+.bar-labels { display: flex; min-height: 1.2em; justify-content: space-between; gap: 8px; margin-top: 7px; color: var(--muted); font-size: clamp(10px, 3.5vmin, 16px); line-height: 1.2; }
 .bar-labels span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.tiles { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 2.5vw, 12px); margin-top: clamp(12px, 2.8vh, 20px); }
-.tiles[hidden] { display: none; }
+.tiles { display: grid; width: 100%; grid-auto-rows: clamp(49px, 15vmin, 68px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 2.5vw, 12px); margin: 0; }
+.tiles[hidden] { visibility: hidden; }
 .tile { display: flex; min-width: 0; min-height: clamp(49px, 15vmin, 68px); flex-direction: column; justify-content: center; gap: 4px; padding: 8px clamp(7px, 3vw, 14px); border-radius: clamp(10px, 3.3vmin, 16px); background: var(--box); text-align: left; }
+.tile[hidden] { display: flex; visibility: hidden; }
 .tile span { overflow: hidden; color: var(--muted); font-size: clamp(9px, 3.3vmin, 14px); letter-spacing: .04em; text-overflow: ellipsis; white-space: nowrap; }
 .tile strong { overflow: hidden; font-size: clamp(14px, 4.8vmin, 22px); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -297,13 +307,57 @@ h1 {
 #error { position: absolute; z-index: 6; right: 12px; bottom: 12px; left: 12px; padding: 10px 14px; border-radius: 8px; background: var(--error); color: #fff; font-size: 14px; text-align: center; }
 #error[hidden] { display: none; }
 
+@media (max-height: 560px) {
+  .header-meta { font-size: clamp(12px, 3.5vmin, 18px); }
+  .content {
+    grid-template-rows:
+      clamp(20px, 4.5vmin, 26px)
+      clamp(26px, 5.8vmin, 30px)
+      clamp(56px, 16vh, 78px)
+      clamp(20px, 4vmin, 24px)
+      clamp(28px, 7vmin, 36px)
+      clamp(42px, 10vmin, 48px);
+    gap: clamp(2px, .8vh, 5px);
+  }
+  .vehicle { font-size: clamp(12px, 3vmin, 18px); }
+  .soc-values { margin-bottom: 3px; font-size: clamp(8px, 2.4vmin, 11px); }
+  .soc-track { height: clamp(6px, 1.8vmin, 9px); }
+  .power-line { min-height: 0; }
+  .power-line .power, .power-line.has-soc .power, .power-line.has-soc .soc-value {
+    font-size: clamp(42px, 14vh, 68px);
+  }
+  .power-unit { font-size: clamp(16px, 5vmin, 24px); }
+  .power-icon { font-size: clamp(24px, 7vmin, 34px); }
+  .status { font-size: clamp(12px, 3.2vmin, 16px); }
+  .energy-flow { margin: 0; }
+  .bar-labels { margin-top: 3px; font-size: clamp(9px, 2.4vmin, 12px); }
+  .tiles { grid-auto-rows: clamp(42px, 10vmin, 48px); margin: 0; }
+  .tile { min-height: 0; gap: 2px; padding-top: 4px; padding-bottom: 4px; }
+  .tile span { font-size: clamp(8px, 2.4vmin, 11px); }
+  .tile strong { font-size: clamp(12px, 3.6vmin, 16px); }
+}
+
 @media (max-height: 400px) {
   .display { gap: 3px; padding-top: 8px; padding-bottom: 7px; }
-  .vehicle { margin-bottom: 0; }
-  .status { margin-top: 3px; }
-  .energy-flow { margin-top: 5px; }
-  .tiles { margin-top: 6px; }
-  .tile { min-height: 38px; gap: 1px; }
+  .content {
+    grid-template-rows:
+      clamp(18px, 4vmin, 22px)
+      clamp(22px, 5vmin, 26px)
+      clamp(46px, 14vh, 58px)
+      clamp(18px, 4vmin, 22px)
+      clamp(24px, 7vmin, 30px)
+      clamp(36px, 9vmin, 42px);
+    gap: 2px;
+  }
+  .power-line .power, .power-line.has-soc .power, .power-line.has-soc .soc-value {
+    font-size: clamp(36px, 12vh, 54px);
+  }
+  .power-unit { font-size: clamp(14px, 4vmin, 20px); }
+  .power-icon { font-size: clamp(20px, 6vmin, 28px); }
+  .tiles { grid-auto-rows: clamp(36px, 9vmin, 42px); }
+  .tile { padding-right: 4px; padding-left: 4px; }
+  .tile span { font-size: 8px; }
+  .tile strong { font-size: 12px; }
 }
 
 @media (orientation: landscape) and (min-width: 600px) {

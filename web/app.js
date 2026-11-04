@@ -254,11 +254,11 @@ function isHouseView(lp) {
 function setTiles(items) {
   const tileEls = [...ui.tiles.children];
   ui.tiles.hidden = !items;
-  if (!items) return;
-  items.forEach((item, index) => {
-    tileEls[index].hidden = item.hidden === true;
-    document.getElementById(`tile-label-${index}`).textContent = item.label;
-    document.getElementById(`tile-value-${index}`).textContent = item.value;
+  tileEls.forEach((tile, index) => {
+    const item = items?.[index];
+    tile.hidden = !item || item.hidden === true;
+    document.getElementById(`tile-label-${index}`).textContent = item?.label || "";
+    document.getElementById(`tile-value-${index}`).textContent = item?.value || "";
   });
 }
 

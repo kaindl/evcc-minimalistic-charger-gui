@@ -205,6 +205,7 @@ h1 {
 .bar-labels span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .tiles { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 2.5vw, 12px); margin-top: clamp(12px, 2.8vh, 20px); }
+.tiles[hidden] { display: none; }
 .tile { display: flex; min-width: 0; min-height: clamp(49px, 15vmin, 68px); flex-direction: column; justify-content: center; gap: 4px; padding: 8px clamp(7px, 3vw, 14px); border-radius: clamp(10px, 3.3vmin, 16px); background: var(--box); text-align: left; }
 .tile span { overflow: hidden; color: var(--muted); font-size: clamp(9px, 3.3vmin, 14px); letter-spacing: .04em; text-overflow: ellipsis; white-space: nowrap; }
 .tile strong { overflow: hidden; font-size: clamp(14px, 4.8vmin, 22px); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }

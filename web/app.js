@@ -399,7 +399,7 @@ function renderSocProgress(lp, showPower) {
   ui.socValue.hidden = false;
   ui.socLimit.hidden = limit === null;
   ui.socMarker.hidden = limit === null;
-  ui.socValues.hidden = limit === null;
+  ui.socValues.hidden = false;
   if (limit !== null) {
     const limitPercent = Math.min(100, Math.max(0, limit));
     ui.soc.style.setProperty("--soc-limit", `${limitPercent}%`);

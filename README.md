@@ -91,7 +91,7 @@ Loadpoints using chargers with evcc's `IntegratedDevice` feature are excluded by
 
 With `control=1`, click the vehicle name to open the vehicle selector. It shows up to six configured evcc vehicles per page; when more are configured, switch pages with the arrows or by swiping. Selecting a vehicle assigns it to that loadpoint and returns to the loadpoint view.
 
-The vehicle selector uses icon names from evcc state and vector paths adapted from evcc's `VehicleIcon` components. See [EVCC-ICONS-LICENSE](web/EVCC-ICONS-LICENSE) for the applicable license.
+The vehicle selector supports all icons exposed by evcc's `VehicleIcon` component, using its SVG paths. The car icon is the [`car3` Shopicon](https://github.com/H2D2-Design/h2d2-shopicons/blob/master/SVG/Regular/Shopicons_Regular_Car3.svg) used by evcc and is also the fallback for unknown names. See [EVCC-ICONS-LICENSE](web/EVCC-ICONS-LICENSE) and [SHOPICONS-LICENSE](web/SHOPICONS-LICENSE) for applicable licenses.
 
 ## Display and controls
 

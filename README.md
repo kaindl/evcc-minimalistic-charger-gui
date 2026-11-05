@@ -6,6 +6,16 @@ The display is inspired by and based on [evcc-garage-display](https://github.com
 
 This project was created with GitHub Copilot.
 
+## Screenshots
+
+### Charging point
+
+![Charging point view with vehicle state of charge, charging power, solar share, and session details](screenshots/charging-point.png)
+
+### House energy flow
+
+![House view with solar usage, grid feed-in, and live power tiles](screenshots/house-energy-flow.png)
+
 ## Run
 
 Requires Go 1.22 or newer:

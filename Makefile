@@ -33,6 +33,8 @@ deb: build
 	install -D -m 0644 packaging/$(APP).env "$(PACKAGE_ROOT)/etc/default/$(APP).env"
 	install -D -m 0644 LICENSE "$(PACKAGE_ROOT)/usr/share/doc/$(APP)/copyright"
 	install -D -m 0644 README.md "$(PACKAGE_ROOT)/usr/share/doc/$(APP)/README.md"
+	install -D -m 0644 screenshots/charging-point.png "$(PACKAGE_ROOT)/usr/share/doc/$(APP)/screenshots/charging-point.png"
+	install -D -m 0644 screenshots/house-energy-flow.png "$(PACKAGE_ROOT)/usr/share/doc/$(APP)/screenshots/house-energy-flow.png"
 	mkdir -p "$(PACKAGE_ROOT)/DEBIAN"
 	printf 'Package: %s\nVersion: %s\nSection: web\nPriority: optional\nArchitecture: %s\nMaintainer: Markus Kaindl\nDescription: Responsive web display for evcc charging points\n A lightweight web interface and API proxy for evcc.\n' \
 		"$(APP)" "$(VERSION)" "$(ARCH)" > "$(PACKAGE_ROOT)/DEBIAN/control"

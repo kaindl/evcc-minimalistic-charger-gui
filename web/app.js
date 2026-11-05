@@ -5,6 +5,7 @@ const supportedLanguages = ["de", "en"];
 const defaults = {
   control: false,
   autoSwitch: true,
+  showIntegratedDevices: false,
   preselect: null,
   preselectTimeout: 60,
   screenTimeout: 120,
@@ -46,6 +47,7 @@ function readConfig() {
     ...defaults,
     control: boolParam("control", defaults.control),
     autoSwitch: boolParam("autoSwitch", defaults.autoSwitch),
+    showIntegratedDevices: boolParam("showIntegratedDevices", defaults.showIntegratedDevices),
     preselect: params.has("preselect") ? Number(params.get("preselect")) : defaults.preselect,
     preselectTimeout: secondsParam("preselectTimeout", defaults.preselectTimeout),
     screenTimeout: secondsParam("screenTimeout", defaults.screenTimeout),
@@ -219,9 +221,11 @@ function updateClock() {
 }
 
 function configuredPoints(allPoints) {
-  let selected = allPoints;
-  if (config.allowlist) selected = allPoints.filter((lp) => config.allowlist.includes(lp.number));
-  if (config.blocklist) selected = allPoints.filter((lp) => !config.blocklist.includes(lp.number));
+  let selected = config.showIntegratedDevices
+    ? allPoints
+    : allPoints.filter((lp) => !lp.chargerFeatureIntegratedDevice);
+  if (config.allowlist) selected = selected.filter((lp) => config.allowlist.includes(lp.number));
+  if (config.blocklist) selected = selected.filter((lp) => !config.blocklist.includes(lp.number));
   return selected;
 }
 
@@ -619,7 +623,7 @@ function renderUnavailable() {
 }
 
 function loadpointFilter() {
-  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleName:.value.vehicleName,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,effectiveLimitSoc:.value.effectiveLimitSoc,vehicleLimitSoc:.value.vehicleLimitSoc,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],vehicles:[(.vehicles // {})|to_entries[]|{name:.key,title:.value.title,icon:.value.icon}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
+  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleName:.value.vehicleName,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,effectiveLimitSoc:.value.effectiveLimitSoc,vehicleLimitSoc:.value.vehicleLimitSoc,chargerFeatureIntegratedDevice:.value.chargerFeatureIntegratedDevice,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],vehicles:[(.vehicles // {})|to_entries[]|{name:.key,title:.value.title,icon:.value.icon}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
 }
 
 async function poll() {

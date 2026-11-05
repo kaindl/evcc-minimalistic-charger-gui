@@ -76,6 +76,7 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `control`          | `0`              | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled. A server started with `--disable-control` keeps them disabled and shows a warning.             |
 | `autoSwitch`       | `1`              | Automatically switch to a newly connected vehicle or a loadpoint whose charging state changed. Set to `0` to disable. As in the source display, automatic switching is suppressed for 60 seconds after user interaction. |
+| `showIntegratedDevices` | `0`         | Set to `1` to include loadpoints whose charger has the `IntegratedDevice` feature. They are hidden by default.                                                                                                               |
 | `preselect`        | none             | evcc loadpoint number to return to after manual browsing, **1-based** as in evcc (for example `2`). It must be included by the allow/block list.                                                                         |
 | `preselectTimeout` | `60`             | Seconds without user interaction before returning to `preselect`. `0` disables the return.                                                                                                                               |
 | `screenTimeout`    | `120`            | Seconds without charging or interaction before the display goes completely black. `0` keeps it on. With `preselect`, only that loadpoint counts, and the timer runs only while it is displayed. Tap anywhere to wake it. |
@@ -85,6 +86,8 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 | `blocklist`        | none             | Comma-separated evcc loadpoint numbers to hide, e.g. `blocklist=2`. Cannot be used with `allowlist`.                                                                                                                     |
 
 Loadpoints can be switched manually by swiping left/right or clicking the displayed arrows on either side of the mode buttons. The arrows appear when more than one loadpoint is displayed and disable at the first and last loadpoint. Other screen taps do not change the selected loadpoint.
+
+Loadpoints using chargers with evcc's `IntegratedDevice` feature are excluded by default. Set `showIntegratedDevices=1` to include them in the display.
 
 With `control=1`, click the vehicle name to open the vehicle selector. It shows up to six configured evcc vehicles per page; when more are configured, switch pages with the arrows or by swiping. Selecting a vehicle assigns it to that loadpoint and returns to the loadpoint view.
 

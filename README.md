@@ -21,6 +21,14 @@ go build -o evcc-display .
 ./evcc-display --port 8080 --evcc http://192.168.1.20:7070
 ```
 
+Use `--disable-control` to prevent all charging-mode changes on the server, even if a browser URL requests `?control=1`:
+
+```sh
+./evcc-display --port 8080 --evcc http://192.168.1.20:7070 --disable-control
+```
+
+In this case the mode buttons remain visible but disabled, and the display shows a warning when `control=1` was requested.
+
 The Go process serves the embedded HTML, CSS, JavaScript, and translations and makes same-origin requests to evcc. This avoids browser CORS requirements. The browser should be able to reach this app; only the app process needs to reach evcc.
 
 ## Build, install, and Debian package
@@ -35,7 +43,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now evcc-minimalistic-charger-gui
 ```
 
-Set `EVCC_URL` to the evcc server URL and `PORT` to the display's listening port in `/etc/default/evcc-minimalistic-charger-gui.env`. The service runs with a dynamically allocated unprivileged user. To install into a staging directory instead of the host system, use `make install DESTDIR=/path/to/stage`.
+Set `EVCC_URL` to the evcc server URL and `PORT` to the display's listening port in `/etc/default/evcc-minimalistic-charger-gui.env`. Set `DISABLE_CONTROL=true` there to force-disable charging controls server-side. The service runs with a dynamically allocated unprivileged user. To install into a staging directory instead of the host system, use `make install DESTDIR=/path/to/stage`.
 
 Create a Debian package for the current machine's architecture with:
 
@@ -56,7 +64,7 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 
 | Parameter          | Default          | Description                                                                                                                                                                                                              |
 | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `control`          | `0`              | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled.                                                                                            |
+| `control`          | `0`              | The **Smart**, **Slow**, **Fast**, and **Off** buttons are always shown. Set to `1` to enable them; at `0` they are disabled. A server started with `--disable-control` keeps them disabled and shows a warning.             |
 | `autoSwitch`       | `1`              | Automatically switch to a newly connected vehicle or a loadpoint whose charging state changed. Set to `0` to disable. As in the source display, automatic switching is suppressed for 60 seconds after user interaction. |
 | `preselect`        | none             | evcc loadpoint number to return to after manual browsing, **1-based** as in evcc (for example `2`). It must be included by the allow/block list.                                                                         |
 | `preselectTimeout` | `60`             | Seconds without user interaction before returning to `preselect`. `0` disables the return.                                                                                                                               |

@@ -55,5 +55,6 @@
   "mutuallyExclusive": "allowlist and blocklist cannot be used together.",
   "invalidPreselect": "The preselected charging point is not in the displayed list.",
   "evccUnavailable": "evcc is unavailable.",
-  "unknownLoadpoint": "No charging points found."
+  "unknownLoadpoint": "No charging points found.",
+  "controlDisabled": "Charging controls are disabled by the server."
 }

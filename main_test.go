@@ -50,7 +50,7 @@ func TestHandlerProxiesApprovedAPIRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	handler, err := newHandler(target)
+	handler, err := newHandler(target, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestHandlerProxiesApprovedAPIRequests(t *testing.T) {
 
 func TestHandlerServesEmbeddedIndex(t *testing.T) {
 	target, _ := url.Parse("http://127.0.0.1:7070")
-	handler, err := newHandler(target)
+	handler, err := newHandler(target, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,5 +71,70 @@ func TestHandlerServesEmbeddedIndex(t *testing.T) {
 	handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/", nil))
 	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), `id="display"`) {
 		t.Fatalf("unexpected index response: %d", response.Code)
+	}
+}
+
+func TestHandlerDisablesControlOnServer(t *testing.T) {
+	upstreamRequests := 0
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		upstreamRequests++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	target, err := url.Parse(upstream.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler, err := newHandler(target, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	configResponse := httptest.NewRecorder()
+	handler.ServeHTTP(configResponse, httptest.NewRequest(http.MethodGet, "/api/config", nil))
+	if configResponse.Code != http.StatusOK || !strings.Contains(configResponse.Body.String(), `"controlDisabled":true`) {
+		t.Fatalf("unexpected server config response: %d %q", configResponse.Code, configResponse.Body.String())
+	}
+
+	controlResponse := httptest.NewRecorder()
+	handler.ServeHTTP(controlResponse, httptest.NewRequest(http.MethodPost, "/api/loadpoints/1/mode/off", nil))
+	if controlResponse.Code != http.StatusForbidden {
+		t.Fatalf("control request status = %d, want %d", controlResponse.Code, http.StatusForbidden)
+	}
+	if upstreamRequests != 0 {
+		t.Fatalf("control request reached evcc %d times", upstreamRequests)
+	}
+
+	stateResponse := httptest.NewRecorder()
+	handler.ServeHTTP(stateResponse, httptest.NewRequest(http.MethodGet, "/api/state", nil))
+	if stateResponse.Code != http.StatusOK || upstreamRequests != 1 {
+		t.Fatalf("state API request was not proxied: status %d, upstream requests %d", stateResponse.Code, upstreamRequests)
+	}
+}
+
+func TestHandlerAllowsControlByDefault(t *testing.T) {
+	upstreamRequests := 0
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		upstreamRequests++
+		if r.URL.Path != "/api/loadpoints/1/mode/off" {
+			t.Errorf("unexpected upstream path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer upstream.Close()
+	target, err := url.Parse(upstream.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler, err := newHandler(target, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, "/api/loadpoints/1/mode/off", nil))
+	if response.Code != http.StatusNoContent || upstreamRequests != 1 {
+		t.Fatalf("control request was not proxied: status %d, upstream requests %d", response.Code, upstreamRequests)
 	}
 }

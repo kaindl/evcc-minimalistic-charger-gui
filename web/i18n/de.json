@@ -55,5 +55,6 @@
   "mutuallyExclusive": "allowlist und blocklist können nicht gemeinsam gesetzt werden.",
   "invalidPreselect": "Der vorausgewählte Ladepunkt ist nicht in der angezeigten Liste.",
   "evccUnavailable": "evcc ist nicht erreichbar.",
-  "unknownLoadpoint": "Keine Ladepunkte gefunden."
+  "unknownLoadpoint": "Keine Ladepunkte gefunden.",
+  "controlDisabled": "Die Steuerung wurde serverseitig deaktiviert."
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -23,6 +24,7 @@ var loadpointAction = regexp.MustCompile(`^/api/loadpoints/[1-9][0-9]*/(mode/(of
 func main() {
 	port := flag.Int("port", 8080, "HTTP port for the web interface")
 	evccAddress := flag.String("evcc", envOr("EVCC_URL", "http://127.0.0.1:7070"), "evcc base URL")
+	disableControl := flag.Bool("disable-control", false, "disable charging controls regardless of browser settings")
 	flag.Parse()
 
 	if *port < 1 || *port > 65535 {
@@ -36,7 +38,7 @@ func main() {
 		log.Fatal("evcc URL must not include a path")
 	}
 
-	handler, err := newHandler(upstream)
+	handler, err := newHandler(upstream, *disableControl)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +51,7 @@ func main() {
 	log.Fatal(server.ListenAndServe())
 }
 
-func newHandler(upstream *url.URL) (http.Handler, error) {
+func newHandler(upstream *url.URL, disableControl bool) (http.Handler, error) {
 	staticFiles, err := fs.Sub(webFiles, "web")
 	if err != nil {
 		return nil, fmt.Errorf("load embedded web files: %w", err)
@@ -63,8 +65,25 @@ func newHandler(upstream *url.URL) (http.Handler, error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/config" {
+			if r.Method != http.MethodGet {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			if err := json.NewEncoder(w).Encode(struct {
+				ControlDisabled bool `json:"controlDisabled"`
+			}{ControlDisabled: disableControl}); err != nil {
+				log.Printf("write server configuration response: %v", err)
+			}
+			return
+		}
 		if !allowedAPIRequest(r) {
 			http.NotFound(w, r)
+			return
+		}
+		if disableControl && r.Method == http.MethodPost {
+			http.Error(w, "charging controls are disabled by server configuration", http.StatusForbidden)
 			return
 		}
 		proxy.ServeHTTP(w, r)

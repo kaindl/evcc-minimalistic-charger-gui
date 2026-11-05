@@ -98,6 +98,8 @@ const ui = {
 };
 
 let config;
+let controlRequested = false;
+let serverControlDisabled = false;
 let translations = {};
 let locale = "en";
 let points = [];
@@ -154,6 +156,7 @@ const english = {
   mutuallyExclusive: "allowlist and blocklist cannot be used together.",
   invalidPreselect: "The preselected charging point is not in the displayed list.",
   evccUnavailable: "evcc is unavailable.", unknownLoadpoint: "No charging points found.",
+  controlDisabled: "Charging controls are disabled by the server.",
 };
 
 function formatNumber(value, digits = 1) {
@@ -477,6 +480,7 @@ function render() {
   if (!lp) return;
   renderLoadpoint(lp);
   updateNavigation();
+  if (controlRequested && serverControlDisabled) setStatus("controlDisabled", "warn");
 }
 
 function renderUnavailable() {
@@ -492,6 +496,7 @@ function renderUnavailable() {
   setTiles(null);
   setStatus("evccUnavailable", "error");
   ui.controls.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  if (controlRequested && serverControlDisabled) setStatus("controlDisabled", "warn");
 }
 
 function loadpointFilter() {
@@ -681,7 +686,16 @@ async function start() {
     ui.previousLoadpoint.setAttribute("aria-label", translate("previousLoadpoint"));
     ui.nextLoadpoint.setAttribute("aria-label", translate("nextLoadpoint"));
     ui.navigation.setAttribute("aria-label", translate("loadpointNavigation"));
+    const serverConfigResponse = await fetch("/api/config", { cache: "no-store" });
+    if (!serverConfigResponse.ok) throw new Error(`Could not load server configuration: HTTP ${serverConfigResponse.status}`);
+    const serverConfig = await serverConfigResponse.json();
+    if (typeof serverConfig.controlDisabled !== "boolean") {
+      throw new Error("Server configuration response is invalid");
+    }
+    serverControlDisabled = serverConfig.controlDisabled;
     config = readConfig();
+    controlRequested = config.control;
+    if (serverControlDisabled) config.control = false;
     document.documentElement.dataset.theme = config.theme;
     updateClock();
     await poll();

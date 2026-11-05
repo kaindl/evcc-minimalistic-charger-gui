@@ -94,6 +94,14 @@ const ui = {
   previousLoadpoint: document.getElementById("previous-loadpoint"),
   nextLoadpoint: document.getElementById("next-loadpoint"),
   dots: document.getElementById("dots"),
+  vehicleSelector: document.getElementById("vehicle-selector"),
+  vehicleSelectorBack: document.getElementById("vehicle-selector-back"),
+  vehicleCards: document.getElementById("vehicle-cards"),
+  vehicleSelectorEmpty: document.getElementById("vehicle-selector-empty"),
+  vehicleSelectorNavigation: document.getElementById("vehicle-selector-navigation"),
+  previousVehiclePage: document.getElementById("previous-vehicle-page"),
+  nextVehiclePage: document.getElementById("next-vehicle-page"),
+  vehiclePageDots: document.getElementById("vehicle-page-dots"),
   screenOff: document.getElementById("screen-off"),
 };
 
@@ -103,6 +111,7 @@ let serverControlDisabled = false;
 let translations = {};
 let locale = "en";
 let points = [];
+let vehicles = [];
 let current = 0;
 let statesReady = false;
 let lastSuccess = 0;
@@ -113,6 +122,11 @@ let pendingMode = null;
 let screenIsOff = false;
 let pointerStart = null;
 let lastClock = "";
+let vehicleSelectorOpen = false;
+let selectorLoadpointNumber = null;
+let vehicleSelectorPage = 0;
+let pendingVehicle = null;
+let suppressVehicleCardClick = false;
 
 const iconPaths = {
   sun: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>',
@@ -157,6 +171,16 @@ const english = {
   invalidPreselect: "The preselected charging point is not in the displayed list.",
   evccUnavailable: "evcc is unavailable.", unknownLoadpoint: "No charging points found.",
   controlDisabled: "Charging controls are disabled by the server.",
+  back: "Back", selectVehicle: "Select a vehicle", noVehiclesAvailable: "No vehicles configured",
+};
+
+const evccVehicleIconPaths = {
+  bike: "M5 20q-2.125 0-3.562-1.438Q0 17.125 0 15t1.463-3.562Q2.925 10 5 10q1.925 0 3.238 1.15Q9.55 12.3 9.9 14h.65l-1.8-5H8q-.425 0-.713-.288Q7 8.425 7 8t.287-.713Q7.575 7 8 7h3q.425 0 .713.287Q12 7.575 12 8t-.287.712Q11.425 9 11 9h-.1l.35 1h4.8L14.6 6H13q-.425 0-.712-.287Q12 5.425 12 5t.288-.713Q12.575 4 13 4h1.6q.65 0 1.163.35q.512.35.737.95l1.7 4.65h.8q2.075 0 3.538 1.462Q24 12.875 24 14.95q0 2.1-1.45 3.575Q21.1 20 19 20q-1.8 0-3.162-1.125Q14.475 17.75 14.1 16H9.9q-.35 1.725-1.7 2.863Q6.85 20 5 20Zm0-2q1.025 0 1.763-.562Q7.5 16.875 7.8 16H6q-.425 0-.713-.288Q5 15.425 5 15t.287-.713Q5.575 14 6 14h1.8q-.3-.9-1.037-1.45Q6.025 12 5 12q-1.275 0-2.138.863Q2 13.725 2 15q0 1.25.862 2.125Q3.725 18 5 18Zm7.7-4h1.4q.125-.575.338-1.075q.212-.5.562-.925h-3.05Zm6.3 4q1.275 0 2.138-.875Q22 16.25 22 15q0-1.275-.862-2.137Q20.275 12 19 12h-.1l.65 1.7q.15.4-.037.762q-.188.363-.563.538q-.4.175-.775-.013q-.375-.187-.525-.587l-.6-1.7q-.5.425-.775 1T16 15q0 1.25.863 2.125Q17.725 18 19 18Z",
+  bus: "M6.5 21q-.625 0-1.062-.438Q5 20.125 5 19.5v-1.55q-.45-.5-.725-1.113Q4 16.225 4 15.5V6q0-2.075 1.925-3.038Q7.85 2 12 2q4.3 0 6.15.925Q20 3.85 20 6v9.5q0 .725-.275 1.337q-.275.613-.725 1.113v1.55q0 .625-.438 1.062Q18.125 21 17.5 21t-1.062-.438Q16 20.125 16 19.5V19H8v.5q0 .625-.438 1.062Q7.125 21 6.5 21ZM6 10h12V7H6Zm2.5 6q.625 0 1.062-.438Q10 15.125 10 14.5t-.438-1.062Q9.125 13 8.5 13t-1.062.438Q7 13.875 7 14.5t.438 1.062Q7.875 16 8.5 16Zm7 0q.625 0 1.062-.438Q17 15.125 17 14.5t-.438-1.062Q16.125 13 15.5 13t-1.062.438Q14 13.875 14 14.5t.438 1.062Q14.875 16 15.5 16ZM8 17h8q.825 0 1.413-.587Q18 15.825 18 15v-3H6v3q0 .825.588 1.413Q7.175 17 8 17Z",
+  van: "M6 20q-1.25 0-2.125-.875T3 17q-.825 0-1.412-.587Q1 15.825 1 15V6q0-.825.588-1.412Q2.175 4 3 4h12q.825 0 1.413.588Q17 5.175 17 6v2h2.5q.25 0 .45.1t.35.3l2.5 3.325q.1.125.15.275q.05.15.05.325V16q0 .425-.288.712Q22.425 17 22 17h-1q0 1.25-.875 2.125T18 20q-1.25 0-2.125-.875T15 17H9q0 1.25-.875 2.125T6 20ZM3 6v9h.8q.425-.45.975-.725Q5.325 14 6 14t1.225.275q.55.275.975.725H15V6H3Zm14 7h4.25L19 10h-2Z",
+  taxi: "M6 19v.5q0 .625-.437 1.063T4.5 21t-1.062-.437T3 19.5v-7.15q0-.175.025-.35t.075-.325L4.975 6.35q.2-.6.725-.975T6.875 5H9V4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4v1h2.125q.65 0 1.175.375t.725.975l1.875 5.325q.05.15.075.325t.025.35v7.15q0 .625-.437 1.063T19.5 21t-1.062-.437T18 19.5V19zm-.2-9h12.4l-1.05-3H6.85zM5 17h14v-5H5z",
+  motorcycle: "M5 19q-2.075 0-3.537-1.462Q0 16.075 0 14q0-2.075 1.463-3.538Q2.925 9 5 9h11.6l-2-2H12q-.425 0-.712-.287Q11 6.425 11 6t.288-.713Q11.575 5 12 5h2.975q.2 0 .388.075q.187.075.337.225l3.75 3.75q1.95.15 3.25 1.575T24 14q0 2.075-1.462 3.538Q21.075 19 19 19q-2.075 0-3.537-1.462Q14 16.075 14 14q0-.45.062-.888q.063-.437.238-.862l-2.175 2.175q-.275.275-.637.425q-.363.15-.763.15H9.9q-.35 1.75-1.725 2.875T5 19Zm14-2q1.25 0 2.125-.875T22 14q0-1.25-.875-2.125T19 11q-1.25 0-2.125.875T16 14q0 1.25.875 2.125T19 17ZM5 17q.95 0 1.713-.55Q7.475 15.9 7.8 15H6q-.425 0-.713-.288Q5 14.425 5 14t.287-.713Q5.575 13 6 13h1.8q-.325-.9-1.087-1.45Q5.95 11 5 11q-1.25 0-2.125.875T2 14q0 1.25.875 2.125T5 17Zm4.95-4h.75l2-2H8.95q.375.425.625.925T9.95 13Z",
+  shuttle: "M6 19q-1.25 0-2.125-.875T3 16q-.825 0-1.412-.587T1 14V7q0-.825.588-1.412T3 5h13.175q.4 0 .763.15t.637.425l4.85 4.85q.275.275.425.638t.15.762V14q0 .825-.587 1.413T21 16q0 1.25-.875 2.125T18 19t-2.125-.875T15 16H9q0 1.25-.875 2.125T6 19m9-9h4l-3-3h-1zm-6 0h4V7H9zm-6 0h4V7H3zm3 7.25q.525 0 .888-.363T7.25 16t-.363-.888T6 14.75t-.888.363T4.75 16t.363.888t.887.362m12 0q.525 0 .888-.363T19.25 16t-.363-.888T18 14.75t-.888.363t-.362.887t.363.888t.887.362M8.2 14h7.6q.425-.45.975-.725T18 13t1.225.275t.975.725h.8v-2H3v2h.8q.425-.45.975-.725T6 13t1.225.275T8.2 14Z",
 };
 
 function formatNumber(value, digits = 1) {
@@ -324,6 +348,7 @@ function renderLoadpoint(lp) {
   const house = isHouseView(lp);
   const showPower = lp.connected;
   const mode = modeFor(lp);
+  const selectedVehicle = vehicles.find((vehicle) => vehicle.name === lp.vehicleName);
   ui.flow.classList.remove("feed-in");
   ui.title.textContent = lp.title || `Loadpoint ${lp.number}`;
   ui.connection.innerHTML = live ? "" : icon("alert");
@@ -339,7 +364,7 @@ function renderLoadpoint(lp) {
     ui.vehicle.hidden = !showPower;
     if (showPower) {
       const vehicle = lp.vehicleTitle || translate("vehicle");
-      ui.vehicle.innerHTML = `${icon("car")}<span>${escapeHTML(vehicle)}</span>`;
+      ui.vehicle.innerHTML = `${vehicleIcon(selectedVehicle?.icon)}<span>${escapeHTML(vehicle)}</span>`;
       ui.power.textContent = formatNumber((Number(lp.chargePower) || 0) / 1000);
       ui.power.className = `power${live && lp.charging ? "" : " muted"}`;
       ui.unit.hidden = false;
@@ -378,6 +403,8 @@ function renderLoadpoint(lp) {
     button.setAttribute("aria-pressed", String(button.dataset.mode === (pendingMode || mode)));
     button.disabled = !config.control || !live;
   });
+  ui.vehicle.disabled = !config.control || !live;
+  ui.vehicle.classList.toggle("selectable", config.control);
 }
 
 function renderSocProgress(lp, showPower) {
@@ -470,9 +497,100 @@ function modeFor(lp) {
 }
 
 function escapeHTML(value) {
-  return value.replace(/[&<>"']/g, (char) => ({
+  return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   })[char]);
+}
+
+function vehicleIcon(name) {
+  const path = Object.prototype.hasOwnProperty.call(evccVehicleIconPaths, name)
+    ? evccVehicleIconPaths[name]
+    : null;
+  if (!path) return icon("car");
+  return `<svg class="vehicle-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="${path}"></path></svg>`;
+}
+
+function openVehicleSelector() {
+  if (!config.control || serverControlDisabled || !currentPoint()) return;
+  vehicleSelectorOpen = true;
+  selectorLoadpointNumber = currentPoint().number;
+  vehicleSelectorPage = 0;
+  lastUserActivity = Date.now();
+  preselectActivity = lastUserActivity;
+  renderVehicleSelector();
+  ui.vehicleSelector.hidden = false;
+}
+
+function closeVehicleSelector() {
+  if (!vehicleSelectorOpen) return;
+  const targetIndex = points.findIndex((lp) => lp.number === selectorLoadpointNumber);
+  if (targetIndex >= 0) current = targetIndex;
+  vehicleSelectorOpen = false;
+  selectorLoadpointNumber = null;
+  vehicleSelectorPage = 0;
+  pendingVehicle = null;
+  ui.vehicleSelector.hidden = true;
+  render();
+}
+
+function renderVehicleSelector() {
+  const lp = points.find((point) => point.number === selectorLoadpointNumber);
+  if (!lp) return;
+  const pageCount = Math.ceil(vehicles.length / 6);
+  vehicleSelectorPage = Math.min(vehicleSelectorPage, Math.max(pageCount - 1, 0));
+  const availableVehicles = vehicles.slice(vehicleSelectorPage * 6, vehicleSelectorPage * 6 + 6);
+  ui.vehicleCards.replaceChildren(...availableVehicles.map((vehicle) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "vehicle-card";
+    card.setAttribute("aria-pressed", String(vehicle.name === lp.vehicleName));
+    card.disabled = pendingVehicle !== null;
+    card.dataset.vehicleName = vehicle.name;
+    card.innerHTML = vehicleIcon(vehicle.icon);
+    const title = document.createElement("span");
+    title.textContent = vehicle.title || vehicle.name;
+    card.append(title);
+    card.addEventListener("click", () => {
+      if (!suppressVehicleCardClick) selectVehicle(vehicle.name);
+    });
+    return card;
+  }));
+  ui.vehicleSelectorEmpty.hidden = availableVehicles.length > 0;
+  ui.vehicleSelectorNavigation.hidden = pageCount < 2;
+  ui.previousVehiclePage.disabled = vehicleSelectorPage === 0;
+  ui.nextVehiclePage.disabled = vehicleSelectorPage >= pageCount - 1;
+  ui.vehiclePageDots.replaceChildren(...Array.from({ length: pageCount }, (_, index) => {
+    const dot = document.createElement("span");
+    dot.className = `dot${index === vehicleSelectorPage ? " active" : ""}`;
+    return dot;
+  }));
+}
+
+function moveVehiclePage(delta) {
+  const pageCount = Math.ceil(vehicles.length / 6);
+  const nextPage = vehicleSelectorPage + delta;
+  if (!vehicleSelectorOpen || nextPage < 0 || nextPage >= pageCount) return;
+  vehicleSelectorPage = nextPage;
+  lastUserActivity = Date.now();
+  preselectActivity = lastUserActivity;
+  renderVehicleSelector();
+}
+
+async function selectVehicle(name) {
+  if (!config.control || serverControlDisabled || !selectorLoadpointNumber || pendingVehicle !== null) return;
+  const loadpointNumber = selectorLoadpointNumber;
+  pendingVehicle = name;
+  renderVehicleSelector();
+  try {
+    await requestPost(`/api/loadpoints/${loadpointNumber}/vehicle/${encodeURIComponent(name)}`);
+    closeVehicleSelector();
+    await poll();
+  } catch (error) {
+    console.error("Could not select evcc vehicle:", error);
+    showError(error.message);
+    pendingVehicle = null;
+    renderVehicleSelector();
+  }
 }
 
 function render() {
@@ -488,6 +606,7 @@ function renderUnavailable() {
   ui.title.textContent = "evcc";
   ui.connection.innerHTML = icon("alert");
   ui.vehicle.hidden = true;
+  ui.vehicle.disabled = true;
   ui.power.textContent = "—";
   ui.power.className = "power muted";
   ui.unit.hidden = true;
@@ -500,7 +619,7 @@ function renderUnavailable() {
 }
 
 function loadpointFilter() {
-  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,effectiveLimitSoc:.value.effectiveLimitSoc,vehicleLimitSoc:.value.vehicleLimitSoc,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
+  return `{lps:[.loadpoints|to_entries[] | {number:(.key+1),title:.value.title,mode:.value.mode,alwaysCharge:.value.alwaysCharge,chargePower:.value.chargePower,charging:.value.charging,connected:.value.connected,chargedEnergy:.value.chargedEnergy,chargeDuration:.value.chargeDuration,phasesActive:.value.phasesActive,sessionSolarPercentage:.value.sessionSolarPercentage,vehicleName:.value.vehicleName,vehicleTitle:.value.vehicleTitle,vehicleSoc:.value.vehicleSoc,effectiveLimitSoc:.value.effectiveLimitSoc,vehicleLimitSoc:.value.vehicleLimitSoc,pvAction:.value.pvAction,pvRemaining:.value.pvRemaining,planActive:.value.planActive,smartCostActive:.value.smartCostActive,minCurrent:(.value.effectiveMinCurrent // .value.minCurrent),phasesConfigured:.value.phasesConfigured,chargerPhases1p3p:.value.chargerPhases1p3p}],vehicles:[(.vehicles // {})|to_entries[]|{name:.key,title:.value.title,icon:.value.icon}],green:.greenShareLoadpoints,pv:.pvPower,home:.homePower,bat:((try (if (.battery.devices|length)>0 then .battery.soc else null end) catch null)//.batterySoc),batp:((try (if (.battery.devices|length)>0 then .battery.power else null end) catch null)//.batteryPower),grid:((try .grid.power catch null)//.gridPower)}`;
 }
 
 async function poll() {
@@ -512,6 +631,7 @@ async function poll() {
     const data = await response.json();
     const root = data.result && typeof data.result === "object" ? data.result : data;
     if (!Array.isArray(root.lps)) throw new Error("evcc state response has no loadpoints");
+    vehicles = Array.isArray(root.vehicles) ? root.vehicles : [];
     const allPoints = root.lps.map((item, index) => {
       const lp = item || {};
       const green = Array.isArray(root.green) ? root.green[index] : root.green;
@@ -545,12 +665,19 @@ async function poll() {
       if (config.preselect !== null && current === initialPreselect) lastUserActivity = now;
       if (config.preselect === null && jumpTo >= 0 && config.autoSwitch) current = jumpTo;
     } else if (config.autoSwitch && jumpTo >= 0 && now - lastUserActivity >= 60000) {
-      current = jumpTo;
-      lastUserActivity = now;
+      if (!vehicleSelectorOpen) {
+        current = jumpTo;
+        lastUserActivity = now;
+      }
+    }
+    if (vehicleSelectorOpen) {
+      const selectorIndex = points.findIndex((lp) => lp.number === selectorLoadpointNumber);
+      if (selectorIndex >= 0) current = selectorIndex;
     }
     lastSuccess = now;
     showError("");
     render();
+    if (vehicleSelectorOpen) renderVehicleSelector();
   } catch (error) {
     console.error("Could not load evcc state:", error);
     if (error.message === translate("invalidPreselect") || error.message === translate("unknownLoadpoint")) {
@@ -609,6 +736,10 @@ function handlePointerDown(event) {
     pointerStart = null;
     return;
   }
+  if (vehicleSelectorOpen) {
+    pointerStart = { x: event.clientX, y: event.clientY, vehicleSelector: true };
+    return;
+  }
   if (event.target.closest("button")) {
     pointerStart = null;
     return;
@@ -617,13 +748,25 @@ function handlePointerDown(event) {
 }
 
 function handlePointerUp(event) {
-  if (!pointerStart || points.length < 2) {
-    pointerStart = null;
+  if (!pointerStart) {
     return;
   }
   const dx = event.clientX - pointerStart.x;
   const dy = event.clientY - pointerStart.y;
+  const vehicleSelectorGesture = pointerStart.vehicleSelector;
   pointerStart = null;
+  if (vehicleSelectorGesture) {
+    if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy)) {
+      suppressVehicleCardClick = true;
+      moveVehiclePage(dx < 0 ? 1 : -1);
+      event.preventDefault();
+      window.setTimeout(() => { suppressVehicleCardClick = false; }, 0);
+    }
+    return;
+  }
+  if (points.length < 2) {
+    return;
+  }
   if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy)) {
     moveBy(dx < 0 ? 1 : -1);
   }
@@ -633,7 +776,7 @@ function runTimeouts() {
   const now = Date.now();
   if (config.preselect !== null && config.preselectTimeout > 0 && points.length) {
     const preselected = points.findIndex((lp) => lp.number === config.preselect);
-    if (preselected >= 0 && current !== preselected && now - preselectActivity >= config.preselectTimeout * 1000) {
+    if (!vehicleSelectorOpen && preselected >= 0 && current !== preselected && now - preselectActivity >= config.preselectTimeout * 1000) {
       setCurrent(preselected, "timeout");
       lastUserActivity = now;
     }
@@ -686,6 +829,10 @@ async function start() {
     ui.previousLoadpoint.setAttribute("aria-label", translate("previousLoadpoint"));
     ui.nextLoadpoint.setAttribute("aria-label", translate("nextLoadpoint"));
     ui.navigation.setAttribute("aria-label", translate("loadpointNavigation"));
+    ui.vehicleSelectorBack.setAttribute("aria-label", translate("back"));
+    ui.previousVehiclePage.setAttribute("aria-label", translate("previousVehiclePage"));
+    ui.nextVehiclePage.setAttribute("aria-label", translate("nextVehiclePage"));
+    ui.vehicleSelectorNavigation.setAttribute("aria-label", translate("vehiclePageNavigation"));
     const serverConfigResponse = await fetch("/api/config", { cache: "no-store" });
     if (!serverConfigResponse.ok) throw new Error(`Could not load server configuration: HTTP ${serverConfigResponse.status}`);
     const serverConfig = await serverConfigResponse.json();
@@ -716,6 +863,13 @@ display.addEventListener("pointerup", handlePointerUp);
 display.addEventListener("pointercancel", () => { pointerStart = null; });
 ui.previousLoadpoint.addEventListener("click", () => moveBy(-1));
 ui.nextLoadpoint.addEventListener("click", () => moveBy(1));
+ui.vehicle.addEventListener("click", openVehicleSelector);
+ui.vehicleSelectorBack.addEventListener("click", closeVehicleSelector);
+ui.previousVehiclePage.addEventListener("click", () => moveVehiclePage(-1));
+ui.nextVehiclePage.addEventListener("click", () => moveVehiclePage(1));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && vehicleSelectorOpen) closeVehicleSelector();
+});
 ui.controls.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-mode]");
   if (button && !button.disabled) postMode(button.dataset.mode);

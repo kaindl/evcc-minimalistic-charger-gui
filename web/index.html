@@ -22,7 +22,7 @@
       </header>
 
       <section class="content" aria-live="polite">
-        <div id="vehicle" class="vehicle"></div>
+        <button id="vehicle" class="vehicle" type="button" disabled></button>
         <div id="soc-progress" class="soc-progress" role="img" hidden>
           <div id="soc-values" class="soc-values" hidden>
             <span>SoC</span>
@@ -81,6 +81,26 @@
       <nav id="loadpoint-navigation" class="loadpoint-navigation" aria-label="Loadpoint navigation" hidden>
         <div id="dots" class="dots" aria-hidden="true"></div>
       </nav>
+      <section id="vehicle-selector" class="vehicle-selector" aria-labelledby="vehicle-selector-title" hidden>
+        <header class="vehicle-selector-header">
+          <button id="vehicle-selector-back" class="vehicle-selector-back" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+            <span data-i18n="back"></span>
+          </button>
+          <h2 id="vehicle-selector-title" data-i18n="selectVehicle"></h2>
+        </header>
+        <div id="vehicle-cards" class="vehicle-cards"></div>
+        <p id="vehicle-selector-empty" class="vehicle-selector-empty" data-i18n="noVehiclesAvailable" hidden></p>
+        <nav id="vehicle-selector-navigation" class="vehicle-selector-navigation" aria-label="Vehicle pages" hidden>
+          <button id="previous-vehicle-page" class="loadpoint-arrow" type="button" aria-label="Previous vehicle page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+          </button>
+          <div id="vehicle-page-dots" class="dots" aria-hidden="true"></div>
+          <button id="next-vehicle-page" class="loadpoint-arrow" type="button" aria-label="Next vehicle page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+          </button>
+        </nav>
+      </section>
       <div id="screen-off" class="screen-off" hidden></div>
       <div id="error" class="error" role="alert" hidden></div>
     </main>

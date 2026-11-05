@@ -86,6 +86,10 @@ http://display-host:8080/?control=1&preselect=2&preselectTimeout=60&screenTimeou
 
 Loadpoints can be switched manually by swiping left/right or clicking the displayed arrows on either side of the mode buttons. The arrows appear when more than one loadpoint is displayed and disable at the first and last loadpoint. Other screen taps do not change the selected loadpoint.
 
+With `control=1`, click the vehicle name to open the vehicle selector. It shows up to six configured evcc vehicles per page; when more are configured, switch pages with the arrows or by swiping. Selecting a vehicle assigns it to that loadpoint and returns to the loadpoint view.
+
+The vehicle selector uses icon names from evcc state and vector paths adapted from evcc's `VehicleIcon` components. See [EVCC-ICONS-LICENSE](web/EVCC-ICONS-LICENSE) for the applicable license.
+
 ## Display and controls
 
 The responsive layout scales its spacing and typography with the available viewport and adapts to portrait and landscape aspect ratios. It shows the loadpoint name and time, vehicle, charging power with the vehicle state of charge alongside it, a state-of-charge bar with the lower of the effective and vehicle charging limits (when available), evcc status, solar/grid share, session data, and — when no vehicle is connected and PV data is available — house, solar, and battery flow.
@@ -103,4 +107,4 @@ By default, the only interaction is switching loadpoints. When `control=1`, the 
 
 The page polls `GET /api/state?jq=…` every three seconds. The jq projection follows `src/evcc_client.cpp` in the source project and requests the loadpoint mode, vehicle, power, charging/session state, plus PV, home, battery, and grid data. Mode buttons proxy `POST /api/loadpoints/{number}/…`.
 
-The server forwards only `GET /api/state` and the supported loadpoint mode/always-charge `POST` routes. It is not a general-purpose proxy. The browser talks to this app on the same origin, so evcc does not need to enable cross-origin access.
+The server forwards only `GET /api/state` and the supported loadpoint mode/always-charge/vehicle-selection `POST` routes. Vehicle names and icon identifiers come from the state response. It is not a general-purpose proxy. The browser talks to this app on the same origin, so evcc does not need to enable cross-origin access.

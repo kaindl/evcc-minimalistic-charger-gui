@@ -21,6 +21,8 @@ func TestAllowedAPIRequest(t *testing.T) {
 		{"mode post", http.MethodPost, "/api/loadpoints/2/mode/now", "", true},
 		{"off mode post", http.MethodPost, "/api/loadpoints/2/mode/off", "", true},
 		{"always-charge post", http.MethodPost, "/api/loadpoints/1/alwayscharge/off", "", true},
+		{"vehicle selection post", http.MethodPost, "/api/loadpoints/2/vehicle/my-car", "", true},
+		{"vehicle selection invalid name", http.MethodPost, "/api/loadpoints/2/vehicle/my%20car", "", false},
 		{"mode get", http.MethodGet, "/api/loadpoints/1/mode/now", "", false},
 		{"unknown endpoint", http.MethodPost, "/api/config", "", false},
 		{"invalid loadpoint", http.MethodPost, "/api/loadpoints/0/mode/now", "", false},
@@ -102,6 +104,11 @@ func TestHandlerDisablesControlOnServer(t *testing.T) {
 	if controlResponse.Code != http.StatusForbidden {
 		t.Fatalf("control request status = %d, want %d", controlResponse.Code, http.StatusForbidden)
 	}
+	vehicleResponse := httptest.NewRecorder()
+	handler.ServeHTTP(vehicleResponse, httptest.NewRequest(http.MethodPost, "/api/loadpoints/1/vehicle/my-car", nil))
+	if vehicleResponse.Code != http.StatusForbidden {
+		t.Fatalf("vehicle selection status = %d, want %d", vehicleResponse.Code, http.StatusForbidden)
+	}
 	if upstreamRequests != 0 {
 		t.Fatalf("control request reached evcc %d times", upstreamRequests)
 	}
@@ -136,5 +143,31 @@ func TestHandlerAllowsControlByDefault(t *testing.T) {
 	handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, "/api/loadpoints/1/mode/off", nil))
 	if response.Code != http.StatusNoContent || upstreamRequests != 1 {
 		t.Fatalf("control request was not proxied: status %d, upstream requests %d", response.Code, upstreamRequests)
+	}
+}
+
+func TestHandlerProxiesVehicleSelection(t *testing.T) {
+	upstreamRequests := 0
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		upstreamRequests++
+		if r.URL.Path != "/api/loadpoints/2/vehicle/my-car" || r.Method != http.MethodPost {
+			t.Errorf("unexpected upstream request: %s %s", r.Method, r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+	target, err := url.Parse(upstream.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler, err := newHandler(target, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, "/api/loadpoints/2/vehicle/my-car", nil))
+	if response.Code != http.StatusOK || upstreamRequests != 1 {
+		t.Fatalf("vehicle selection was not proxied: status %d, upstream requests %d", response.Code, upstreamRequests)
 	}
 }

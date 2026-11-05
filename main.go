@@ -19,7 +19,7 @@ import (
 //go:embed web
 var webFiles embed.FS
 
-var loadpointAction = regexp.MustCompile(`^/api/loadpoints/[1-9][0-9]*/(mode/(off|smart|now|pv|minpv)|alwayscharge/(on|off))$`)
+var loadpointAction = regexp.MustCompile(`^/api/loadpoints/[1-9][0-9]*/(mode/(off|smart|now|pv|minpv)|alwayscharge/(on|off)|vehicle/[a-zA-Z0-9_.:-]+)$`)
 
 func main() {
 	port := flag.Int("port", 8080, "HTTP port for the web interface")

@@ -8,7 +8,7 @@ const defaults = {
   showIntegratedDevices: false,
   preselect: null,
   preselectTimeout: 60,
-  screenTimeout: 120,
+  screenTimeout: 0,
   theme: "dark",
 };
 

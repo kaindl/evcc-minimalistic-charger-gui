@@ -5,7 +5,7 @@ BINDIR ?= $(PREFIX)/bin
 UNITDIR ?= $(PREFIX)/lib/systemd/system
 SYSCONFDIR ?= /etc
 BUILD_DIR ?= build
-VERSION ?= 0.1.0
+VERSION ?= 0.2.0
 ARCH ?= $(shell dpkg --print-architecture)
 
 PACKAGE_ROOT := $(BUILD_DIR)/debian
